@@ -531,10 +531,10 @@ struct ncbNativeObjectBoxing {
 		}
 
 		// for reference
-		template <typename SRC>
-		inline void operator ()(VarT &dst, SRC &src, ncbTypedefs::Tag<SRC&> const &tag) const {
-			operator()<SRC&> (dst, src, tag);
-		}
+		//template <typename SRC>
+		//inline void operator ()(VarT &dst, SRC &src, ncbTypedefs::Tag<SRC&> const &tag) const {
+		//	operator()<SRC&> (dst, src, tag);
+		//}
 	};
 
 	/// Unboxing
@@ -996,14 +996,14 @@ private:
 		}
 
 		// for reference
-		template <typename ResultT>
-		inline bool operator()(ResultT &r, CallerT::tTypeTag<ResultT&> const& tag) {
-			return  operator()<ResultT &>(r, tag);
-		}
-		template <typename ResultT, bool B>
-		inline bool SetResult(ResultT &r, DefsT::Tag<ResultT&> const &tag, DefsT::BoolTag<B> const &sel) {
-			return  SetResult<ResultT &>(r, tag, sel);
-		}
+		//template <typename ResultT>
+		//inline bool operator()(ResultT &r, CallerT::tTypeTag<ResultT&> const& tag) {
+		//	return  operator()<ResultT &>(r, tag);
+		//}
+		//template <typename ResultT, bool B>
+		//inline bool SetResult(ResultT &r, DefsT::Tag<ResultT&> const &tag, DefsT::BoolTag<B> const &sel) {
+		//	return  SetResult<ResultT &>(r, tag, sel);
+		//}
 
 
 	private:
