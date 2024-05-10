@@ -1,0 +1,4 @@
+[submodule "src/kirikiri"]
+	path = src/kirikiri
+	url = git@github.com:Watunder/KRKR.git
+	branch = legacy-win-dx9
