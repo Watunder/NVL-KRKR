@@ -4,6 +4,14 @@
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #endif
 
+#ifndef _WIN64
+#define USER DWL_USER
+#define MSGRESULT DWL_MSGRESULT
+#else
+#define USER DWLP_USER
+#define MSGRESULT DWLP_MSGRESULT
+#endif
+
 #include "ncbind.hpp"
 #include <commctrl.h>
 
@@ -662,7 +670,7 @@ public:
 		WIN32Dialog *inst;
 		switch (msg) {
 		case WM_INITDIALOG:
-			SetWindowLong(hwnd, DWL_USER, (LONG)lparam);
+			SetWindowLong(hwnd, USER, (LONG)lparam);
 			inst = (WIN32Dialog *)lparam;
 			if (inst) {
 				inst->dialogHWnd = hwnd;
@@ -680,15 +688,15 @@ public:
 		case WM_VSCROLL: return NormalCallback(TJS_W("onVScroll"), hwnd, msg, wparam, lparam);
 		case WM_COMMAND: return NormalCallback(TJS_W("onCommand"), hwnd, msg, wparam, lparam);
 		case WM_DRAWITEM:
-			if ((inst = (WIN32Dialog *)GetWindowLong(hwnd, DWL_USER)) != 0)
+			if ((inst = (WIN32Dialog *)GetWindowLong(hwnd, USER)) != 0)
 				return inst->callback(TJS_W("onDrawItem"), wparam, (DRAWITEMSTRUCT*)lparam);
 			break;
 		case WM_NOTIFY:
-			if ((inst = (WIN32Dialog *)GetWindowLong(hwnd, DWL_USER)) != 0)
+			if ((inst = (WIN32Dialog *)GetWindowLong(hwnd, USER)) != 0)
 				return inst->callback(TJS_W("onNotify"), wparam, (NMHDR*)lparam);
 			break;
 		case WM_DESTROY:
-			if ((inst = (WIN32Dialog *)GetWindowLong(hwnd, DWL_USER)) != 0 && inst->hHook != NULL)
+			if ((inst = (WIN32Dialog *)GetWindowLong(hwnd, USER)) != 0 && inst->hHook != NULL)
 				UnhookWindowsHookEx(inst->hHook);
 			return FALSE;
 		case WM_CTLCOLORBTN:
@@ -696,7 +704,7 @@ public:
 		case WM_CTLCOLORSTATIC:
 //		case WM_CTLCOLORLISTBOX:
 //		case WM_CTLCOLORSCROLLBAR:
-			if ((inst = (WIN32Dialog *)GetWindowLong(hwnd, DWL_USER)) != 0) {
+			if ((inst = (WIN32Dialog *)GetWindowLong(hwnd, USER)) != 0) {
 				int id = GetDlgCtrlID((HWND)lparam);
 				tjs_char *event = NULL;
 				switch (msg) {
@@ -713,7 +721,7 @@ public:
 		return FALSE;
 	}
 	static LRESULT NormalCallback(NameT cbn, HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
-		WIN32Dialog *inst = (WIN32Dialog *)GetWindowLong(hwnd, DWL_USER);
+		WIN32Dialog *inst = (WIN32Dialog *)GetWindowLong(hwnd, USER);
 		return (inst != 0) ? inst->callback(cbn, msg, wparam, lparam) : FALSE;
 	}
 	static LRESULT FAR PASCAL GetMsgProc(int ncode, WPARAM wparam, LPARAM lparam) {
@@ -722,7 +730,7 @@ public:
 		if (ncode >= 0 && PM_REMOVE == wparam) {
 			if ((lpmsg->message >= WM_KEYFIRST && lpmsg->message <= WM_KEYLAST)) {
 				HWND parentHWnd = GetParent(lpmsg->hwnd);
-				if ((inst = (WIN32Dialog *)GetWindowLong(parentHWnd, DWL_USER)) != 0) {
+				if ((inst = (WIN32Dialog *)GetWindowLong(parentHWnd, USER)) != 0) {
 					if(inst->modeless) {
 						if (IsDialogMessage(parentHWnd, lpmsg)) {
 							lpmsg->message	= WM_NULL;
@@ -733,7 +741,7 @@ public:
 				}
 			}
 		}
-		if ((inst = (WIN32Dialog *)GetWindowLong(GetParent(lpmsg->hwnd), DWL_USER)) != 0)
+		if ((inst = (WIN32Dialog *)GetWindowLong(GetParent(lpmsg->hwnd), USER)) != 0)
 			return CallNextHookEx(inst->hHook, ncode, wparam, lparam);
 		return 0;
 	}
@@ -815,7 +823,7 @@ public:
 	}
 
 	void setMessageResult(LONG result) {
-		if (IsValid()) SetWindowLong(dialogHWnd, DWL_MSGRESULT, result);
+		if (IsValid()) SetWindowLong(dialogHWnd, MSGRESULT, result);
 	}
 
 	static tjs_int64  OpenPropertySheet(VarT win, VarT vpages, VarT velm) {
@@ -1446,9 +1454,9 @@ private:
 	static LRESULT CALLBACK ProgressProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 		switch (msg) {
 		case WM_INITDIALOG:
-			::SetWindowLong(hwnd, DWL_USER, (LONG)lparam);
+			::SetWindowLong(hwnd, USER, (LONG)lparam);
 			{
-				Progress* self = (Progress*)::GetWindowLong(hwnd, DWL_USER);
+				Progress* self = (Progress*)::GetWindowLong(hwnd, USER);
 				if (self) self->onInit(hwnd);
 			}
 			return TRUE;
@@ -1456,14 +1464,14 @@ private:
 			if (LOWORD(wparam) == IDCANCEL &&
 				HIWORD(wparam) == BN_CLICKED)
 			{
-				Progress* self = (Progress*)::GetWindowLong(hwnd, DWL_USER);
+				Progress* self = (Progress*)::GetWindowLong(hwnd, USER);
 				if (self) self->onCancel();
 				return TRUE;
 			}
 			break;
 		case WM_CLOSE:
 			{
-				Progress* self = (Progress*)::GetWindowLong(hwnd, DWL_USER);
+				Progress* self = (Progress*)::GetWindowLong(hwnd, USER);
 				if (self) self->onCancel();
 			}
 			::DestroyWindow(hwnd);
@@ -1558,7 +1566,7 @@ void WIN32Dialog::setProgressCanceled(bool b)        { checkProgress();    if (p
 
 // -------------------------------------------------------------
 
-#define ENUM(n) Variant(#n, (long)n, 0)
+#define ENUM(n) Variant(#n, long(n), 0)
 
 NCB_REGISTER_SUBCLASS(Header) {
 	Constructor();
@@ -1691,19 +1699,32 @@ NCB_REGISTER_CLASS(WIN32Dialog) {
 	ENUM(WHITE_BRUSH);
 
 	// Window Long index
-	ENUM(GWL_STYLE);
+#ifndef _WIN64
 	ENUM(GWL_WNDPROC);
 	ENUM(GWL_HINSTANCE);
 	ENUM(GWL_HWNDPARENT);
+	ENUM(GWL_USERDATA);
+#else
+	ENUM(GWLP_WNDPROC);
+	ENUM(GWLP_HINSTANCE);
+	ENUM(GWLP_HWNDPARENT);
+	ENUM(GWLP_USERDATA);
+#endif
+	ENUM(GWL_STYLE);
 	ENUM(GWL_STYLE);
 	ENUM(GWL_EXSTYLE);
-	ENUM(GWL_USERDATA);
 	ENUM(GWL_ID);
 
 	// Dialog Long index
+#ifndef _WIN64
 	ENUM(DWL_DLGPROC);
 	ENUM(DWL_MSGRESULT);
 	ENUM(DWL_USER);
+#else
+	ENUM(DWLP_DLGPROC);
+	ENUM(DWLP_MSGRESULT);
+	ENUM(DWLP_USER);
+#endif
 
 	// Window Styles
 	ENUM(WS_OVERLAPPED);
@@ -2857,8 +2878,8 @@ NCB_REGISTER_CLASS(WIN32Dialog) {
 	ENUM(TCN_FOCUSCHANGE);
 
 	// sizeof item structs
-	Variant(TJS_W("SIZEOF_TC_ITEMHEADER"), sizeof(TC_ITEMHEADERW), 0);
-	Variant(TJS_W("SIZEOF_TC_ITEM"),       sizeof(TC_ITEMW), 0);
+	Variant(TJS_W("SIZEOF_TC_ITEMHEADER"), (int)sizeof(TC_ITEMHEADERW), 0);
+	Variant(TJS_W("SIZEOF_TC_ITEM"), (int)sizeof(TC_ITEMW), 0);
 
 
 	////////////////

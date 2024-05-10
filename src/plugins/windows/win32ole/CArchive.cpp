@@ -68,7 +68,7 @@ public:
         /* [in] */ IInternetProtocolSink __RPC_FAR *pOIProtSink,
 		/* [in] */ IInternetBindInfo __RPC_FAR *pOIBindInfo,
         /* [in] */ DWORD grfPI,
-		/* [in] */ DWORD dwReserved) {
+		/* [in] */ HANDLE_PTR dwReserved) {
 
 		LPCWSTR p = wcsstr(szUrl, PROTOCOL L":");
 

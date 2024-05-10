@@ -38,5 +38,8 @@
     <ClInclude Include="..\_binding\tp_stub.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\_binding\simplebinder\simplebinder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
