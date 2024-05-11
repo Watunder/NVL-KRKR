@@ -248,8 +248,10 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PreBuildEvent>
-      <Command>"$(ProjectDir)..\..\win32\genversion.bat" "$(ProjectDir)..\..\win32\version.h" PACKAGE_VERSION</Command>
-      <Message>Generating version.h</Message>
+      <Command>
+      </Command>
+      <Message>
+      </Message>
     </PreBuildEvent>
     <CustomBuildStep>
       <Command>
